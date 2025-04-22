@@ -93,7 +93,7 @@ function Export-WSL {
     )
 
     Write-Log "Exporting WSL distro '$distroName' to '$outputFile'..."
-    wsl.exe --export $distroName $outputFile --format vhd | Out-Null
+    wsl.exe --export $distroName $outputFile --format vhd *> $logFile
 
     if ($?) {
         Write-Log "Export completed successfully."
@@ -111,7 +111,7 @@ function Optimize-BackupVHD {
     )
 
     Write-Log "Optimizing backup VHDX file '$outputFile'..."
-    Optimize-VHD -Path $outputFile -Mode Full | Out-Null
+    Optimize-VHD -Path $outputFile -Mode Full
 
     if ($?) {
         Write-Log "Optimization completed successfully."
@@ -122,10 +122,11 @@ function Optimize-BackupVHD {
     }
 }
 
-
 # -----------------------------------------------------------------------------
 # go johny go
 # -----------------------------------------------------------------------------
+
+New-OutputDir -outputDir $outputDir
 
 Write-Log "-------------------------------------------------------"
 Write-Log "Starting backup process for WSL distro '$distroName'..."
@@ -138,7 +139,6 @@ if (-not (Test-IsAdministrator)) {
 $tmpFile = "$tempDir\$distroName.vhdx"
 $outputFile = "$outputDir\$distroName.vhdx"
 
-New-OutputDir -outputDir $outputDir
 Stop-DockerDesktop
 Stop-WSL -distroName $distroName 
 Export-WSL -distroName $distroName -outputFile $tmpFile
